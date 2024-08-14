@@ -1,0 +1,13 @@
+route:
+    receiver: 'telegram-receiver'
+    repeat_interval: 24h
+    group_by : [ alertname ]
+
+receivers:
+  - name: 'telegram-receiver'
+    telegram_configs:
+    - bot_token: 6423828770:AAEX_BtDtPb_1QlxfZP7dsoyfYk543FpXc4
+      send_resolved: true
+      api_url: https://api.telegram.org
+      chat_id: 377375680
+      parse_mode: ''

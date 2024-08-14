@@ -1,0 +1,32 @@
+groups:
+- name: example
+  rules:
+
+  - alert: service_down
+    expr: up == 0
+    for: 30s
+    labels:
+      severity: telegram
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 30 seconds."
+ 
+  - alert: service_slow
+    expr: probe_http_duration_seconds > 1 and probe_http_duration_seconds{phase="connect"}
+    for: 30s
+    labels:
+      severity: telegram
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "{{ $labels.instance }} of job {{ $labels.job }} has been slow for more than 30 seconds."
+
+
+  - alert: cpu_overused
+    expr: avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) / 100 > 90
+    for: 600s
+    labels:
+      severity: telegram
+    annotations:
+      summary: "Instance {{ $labels.instance }} down"
+      description: "CPU is over 95% usage for more than 10 mins"
+
