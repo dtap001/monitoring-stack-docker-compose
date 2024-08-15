@@ -13,12 +13,7 @@ alerting:
     static_configs:
     - targets:
       - "alertmanager:9093"
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
 scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-
   - job_name: "prometheus"
     static_configs:
       - targets: ["localhost:9090"]
@@ -27,20 +22,6 @@ scrape_configs:
     scrape_interval: 30s
     static_configs:
       - targets: ["node_exporter:9100"]
-    metric_relabel_configs:
-      - source_labels: [__name__]
-        # node_memory_MemTotal_bytes`: Total memory in bytes.
-        # node_memory_MemFree_bytes`: Free memory in bytes.
-        # node_memory_Cached_bytes`: Amount of memory used for file caching in bytes.
-        # node_filesystem_avail_bytes`: Available disk space in bytes.
-        # node_filesystem_size_bytes`: Total disk space in bytes.
-        # node_md_state `: indicates if the array is recovering using a spare, resyncing after an event such as an unclean shutdown, active and healthy, or disabled and inactive.
-        # node_md_blocks AND node_md_blocks_synced `:  node_md_blocks and node_md_blocks_synced can tell you how the array getting synced back up is progressin
-        # node_md_disks `: is the primary metric of interest as you will want to know if there are any failed disks, and depending on your the setup you may also know that there must be a minimum number of spares and/or active devices. A RAID1 array with only one active disk is not exactly in prime health after all.
-        regex: '(node_((memory_(MemTotal|MemFree|Cached)_bytes)|(filesystem_(avail|size)_bytes)|(md_(state|blocks|blocks_synced|disks_required))))'
-        action: replace
-        target_label: ls_monitoring #the metrics which are labeled with the ls_monitoring=1 will be scraped by the federated (cloud) prometheus to save bandwith!
-        replacement: '1'
 
   # - job_name: "docker"
   #   scrape_interval: 30s

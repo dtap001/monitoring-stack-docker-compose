@@ -26,14 +26,18 @@ services:
     volumes:
       - ./appdata/grafana/dashboards:/etc/grafana/provisioning/dashboards/configs
       - ./appdata/grafana/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml
-      - ./appdata//grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
-    ports:
-      - 33000:33000
+      - ./appdata/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
     depends_on:
       - prometheus
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${MONITORING_GRAFANA_PASSWORD}
       - GF_SERVER_HTTP_PORT=${MONITORING_GRAFANA_PORT-33000}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Host(${MONITORING_GRAFANA_DOMAIN})"
+      - "traefik.http.routers.nginx.entrypoints=https"
+      - "traefik.http.routers.nginx.tls=true"
+      - "traefik.http.services.nginx.loadbalancer.server.port=33000"
 
   prometheus:
     image: prom/prometheus:v2.42.0
@@ -51,14 +55,16 @@ services:
       - ./appdata/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
       - ./appdata/prometheus/alert.rules.yaml:/etc/prometheus/alert.rules.yaml
       - prometheus_data:/prometheus/data #chown 65534:65534
-    ports:
-      - 9090:9090
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Host(${MONITORING_PROMETHEUS_DOMAIN})"
+      - "traefik.http.routers.nginx.entrypoints=https"
+      - "traefik.http.routers.nginx.tls=true"
+      - "traefik.http.services.nginx.loadbalancer.server.port=9090"
 
   alertmanager:
     image: prom/alertmanager:v0.26.0
     <<: *common-keys
-    ports:
-      - 9093:9093
     volumes:
       - ./appdata/alertmanager/config.yml:/etc/alertmanager/config.yml
     command:
@@ -69,12 +75,10 @@ services:
   blackbox:
     image: prom/blackbox-exporter:v0.23.0
     <<: *common-keys
-    ports:
-    - 9115:9115
     command:
-    - --config.file=/etc/blackbox/blackbox.yml
+      - --config.file=/etc/blackbox/blackbox.yml
     volumes:
-    - ./appdata/blackbox/blackbox.yml:/etc/blackbox/blackbox.yml
+      - ./appdata/blackbox/blackbox.yml:/etc/blackbox/blackbox.yml
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.45.0
@@ -85,34 +89,17 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
 
-  node_exporter:
-    image: prom/node-exporter
-    <<: *common-keys
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    expose:
-      - 9100
-
   loki:
     image: grafana/loki:latest
     <<: *common-keys
-    ports:
-      - 3100:3100
     command: -config.file=/etc/loki/local-config.yaml
 
   promtail:
-    image:  grafana/promtail:latest
+    image: grafana/promtail:latest
     <<: *common-keys
     volumes:
       - ./appdata/promtail/logs:/var/log
-      - ./appdata/promtail//config.yaml:/etc/promtail/docker-config.yaml
+      - ./appdata/promtail/config.yaml:/etc/promtail/docker-config.yaml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - /var/run/docker.sock:/var/run/docker.sock
     command: -config.file=/etc/promtail/docker-config.yaml
@@ -122,8 +109,6 @@ services:
   graphiteexporter:
     image: prom/graphite-exporter:latest
     <<: *common-keys
-    ports:
-      - "9108:9108"
     volumes:
       - ./appdata/graphitexporter/config.yml:/app/config/config.yml
 
@@ -132,11 +117,46 @@ services:
     <<: *common-keys
     environment:
       <<: *default-tz-puid-pgid
-    ports:
-      - "49090:49090"
     volumes:
-     - ./appdata/mikrotikexporter:/home/mktxp/mktxp:rw
+      - ./appdata/mikrotikexporter:/home/mktxp/mktxp:rw
     user: root
+
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      CF_DNS_API_TOKEN: ${MONITORING_TRAEFIK_CLOUDFLARE_API_TOKEN} 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/traefik.yml:/traefik.yml:ro
+      - ./data/acme.json:/acme.json
+      - ./data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(${MONITORING_TRAEFIK_DASHBOARD_DOMAIN})"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${MONITORING_TRAEFIK_DASHBOARD_BASE64_CREDENTIALS}"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(${MONITORING_TRAEFIK_DASHBOARD_DOMAIN})"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.example.com"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.example.com"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
 networks:
   monitoring-services:
 
