@@ -147,8 +147,8 @@ services:
       - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].main=local.example.com"
-      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*.local.example.com"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].main=${MONITORING_HOME_NETWORK_TLD}"
+      - "traefik.http.routers.traefik-secure.tls.domains[0].sans=*. ${MONITORING_HOME_NETWORK_TLD}"
       - "traefik.http.routers.traefik-secure.service=api@internal"
 
 networks:
