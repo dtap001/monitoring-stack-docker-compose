@@ -33,10 +33,10 @@ services:
       - GF_SERVER_HTTP_PORT=${MONITORING_GRAFANA_PORT-33000}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(${MONITORING_GRAFANA_DOMAIN})"
-      - "traefik.http.routers.nginx.entrypoints=https"
-      - "traefik.http.routers.nginx.tls=true"
-      - "traefik.http.services.nginx.loadbalancer.server.port=33000"
+      - "traefik.http.routers.grafana.rule=Host(${MONITORING_GRAFANA_DOMAIN})"
+      - "traefik.http.routers.grafana.entrypoints=https"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.services.grafana.loadbalancer.server.port=33000"
 
   prometheus:
     image: prom/prometheus:v2.42.0
@@ -56,10 +56,10 @@ services:
       - prometheus_data:/prometheus/data #chown 65534:65534
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nginx.rule=Host(${MONITORING_PROMETHEUS_DOMAIN})"
-      - "traefik.http.routers.nginx.entrypoints=https"
-      - "traefik.http.routers.nginx.tls=true"
-      - "traefik.http.services.nginx.loadbalancer.server.port=9090"
+      - "traefik.http.routers.prometheus.rule=Host(${MONITORING_PROMETHEUS_DOMAIN})"
+      - "traefik.http.routers.prometheus.entrypoints=https"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
 
   alertmanager:
     image: prom/alertmanager:v0.26.0
@@ -134,7 +134,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./appdata/traefik/traefik.yaml:/etc/traefik/traefik.yml:ro
-      - ./appdata/traefik/acme.json:/acme.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
