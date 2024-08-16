@@ -33,7 +33,7 @@ services:
       - GF_SERVER_HTTP_PORT=${MONITORING_GRAFANA_PORT-33000}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.grafana.rule=Host(${MONITORING_GRAFANA_DOMAIN})"
+      - "traefik.http.routers.grafana.rule=Host(`${MONITORING_GRAFANA_DOMAIN}`)"
       - "traefik.http.routers.grafana.entrypoints=https"
       - "traefik.http.routers.grafana.tls=true"
       - "traefik.http.services.grafana.loadbalancer.server.port=33000"
@@ -56,7 +56,7 @@ services:
       - prometheus_data:/prometheus/data #chown 65534:65534
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.prometheus.rule=Host(${MONITORING_PROMETHEUS_DOMAIN})"
+      - "traefik.http.routers.prometheus.rule=Host(`${MONITORING_PROMETHEUS_DOMAIN}`)"
       - "traefik.http.routers.prometheus.entrypoints=https"
       - "traefik.http.routers.prometheus.tls=true"
       - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
@@ -137,13 +137,13 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.entrypoints=http"
-      - "traefik.http.routers.traefik.rule=Host(${MONITORING_TRAEFIK_DASHBOARD_DOMAIN})"
+      - "traefik.http.routers.traefik.rule=Host(`${MONITORING_TRAEFIK_DASHBOARD_DOMAIN}`)"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${MONITORING_TRAEFIK_DASHBOARD_BASE64_CREDENTIALS}"
       - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
       - "traefik.http.routers.traefik-secure.entrypoints=https"
-      - "traefik.http.routers.traefik-secure.rule=Host(${MONITORING_TRAEFIK_DASHBOARD_DOMAIN})"
+      - "traefik.http.routers.traefik-secure.rule=Host(`${MONITORING_TRAEFIK_DASHBOARD_DOMAIN}`)"
       - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
       - "traefik.http.routers.traefik-secure.tls=true"
       - "traefik.http.routers.traefik-secure.tls.certresolver=cloudflare"
