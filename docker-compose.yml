@@ -39,7 +39,7 @@ services:
       - "traefik.http.services.grafana.loadbalancer.server.port=33000"
 
   prometheus:
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:v2.54.0
     <<: *common-keys
     deploy:
       resources:
