@@ -1,0 +1,31 @@
+  - job_name: blackbox
+    metrics_path: /probe
+    scrape_interval: 60s
+    params:
+      module: [http_2xx]
+    static_configs:
+    - targets:
+      - nas.home
+      - dns.home
+      - hydra.home
+      - radarr.home66.xyz
+      - assistant.home66.xyz
+      - grafana.home66.xyz
+      - prometheus.home66.xyz
+      - headphones.home66.xyz
+      - nextcloud.home66.xyz
+      - overseerr.home66.xyz
+      - plex.home66.xyz
+      - portainer.home66.xyz
+      - prowlarr.home66.xyz
+      - qbittorrent.home66.xyz
+      - sonarr.home66.xyz
+      - transmission.home66.xyz
+    relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: blackbox:9115
+
