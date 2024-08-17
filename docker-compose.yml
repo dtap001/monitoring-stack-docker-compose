@@ -52,7 +52,7 @@ services:
       <<: *default-tz-puid-pgid
     volumes:
       - ./appdata/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
-      - ./appdata/prometheus/scrape_configs//etc/prometheus/scrape_configs/
+      - ./appdata/prometheus/scrape_configs/:/etc/prometheus/scrape_configs/
       - ./appdata/prometheus/alert.rules.yaml:/etc/prometheus/alert.rules.yaml
       - prometheus_data:/prometheus/data #chown 65534:65534
     labels:
