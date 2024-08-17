@@ -15,4 +15,5 @@ alerting:
       - "alertmanager:9093"
 
 scrape_config_files:
-  - ./scrape-configs/*
+  - /etc/prometheus/scrape_configs/*
+
