@@ -31,7 +31,7 @@ groups:
       description: "CPU is over 95% usage for more than 10 mins"  
       
   - alert: cpu_overused
-    expr: avg_over_time(node_hwmon_temp_celsius[5m]) > 50
+    expr: avg_over_time(node_hwmon_temp_celsius[5m]) > 70
     for: 600s
     labels:
       severity: telegram
