@@ -67,7 +67,7 @@ services:
     <<: *common-keys
     volumes:
       - ./appdata/alertmanager/config.yml:/etc/alertmanager/config.yml
-      - ${MONITORING_STACK_TELEGRAM_BOT_TOKENFILE_LOCATION}:/config/alert-manager-telegram-bot-token-file
+      - ${MONITORING_STACK_TELEGRAM_BOT_TOKENFILE_LOCATION}:/config/.alert-manager-telegram-bot-token-file
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--log.level=debug'
