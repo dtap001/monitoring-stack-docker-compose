@@ -6,7 +6,7 @@ route:
 receivers:
   - name: 'telegram-receiver'
     telegram_configs:
-    - bot_token_file: "../../alert-manager-telegrambot-token-file"
+    - bot_token_file: "/config/alert-manager-telegram-bot-token-file"
       send_resolved: true
       api_url: https://api.telegram.org
       chat_id: 377375680

@@ -67,13 +67,11 @@ services:
     <<: *common-keys
     volumes:
       - ./appdata/alertmanager/config.yml:/etc/alertmanager/config.yml
+      - ${MONITORING_STACK_TELEGRAM_BOT_TOKENFILE_LOCATION}:/config/alert-manager-telegram-bot-token-file
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--log.level=debug'
       - '--storage.path=/alertmanager'
-    environment:
-     - TELEGRAM_BOT_TOKEN=${MONITORING_ALERTING_TELEGRAM_BOT_TOKEN}
-
   blackbox:
     image: prom/blackbox-exporter:v0.23.0
     <<: *common-keys
