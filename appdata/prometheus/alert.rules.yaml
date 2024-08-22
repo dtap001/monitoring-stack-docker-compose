@@ -28,5 +28,14 @@ groups:
       severity: telegram
     annotations:
       summary: "Instance {{ $labels.instance }} down"
-      description: "CPU is over 95% usage for more than 10 mins"
+      description: "CPU is over 95% usage for more than 10 mins"  
+      
+  - alert: cpu_overused
+    expr: avg_over_time(node_hwmon_temp_celsius[5m]) > 50
+    for: 600s
+    labels:
+      severity: telegram
+    annotations:
+      summary: "Instance {{ $labels.instance }} avarage temperature is over 70 celsius for more than 10 minutes"
+      description: "Temp is over 70 celsius for more than 10 mins"
 
