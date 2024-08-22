@@ -72,7 +72,7 @@ services:
       - '--log.level=debug'
       - '--storage.path=/alertmanager'
     environment:
-      TELEGRAM_BOT_TOKEN: "${$MONITORING_ALERTING_TELEGRAM_BOT_TOKEN}"
+      TELEGRAM_BOT_TOKEN: "${MONITORING_ALERTING_TELEGRAM_BOT_TOKEN}"
 
   blackbox:
     image: prom/blackbox-exporter:v0.23.0
