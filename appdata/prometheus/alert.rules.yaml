@@ -4,7 +4,7 @@ groups:
 
   - alert: service_down
     expr: up == 0
-    for: 30s
+    for: 60s
     labels:
       severity: telegram
     annotations:
@@ -13,7 +13,7 @@ groups:
  
   - alert: service_slow
     expr: probe_http_duration_seconds > 3 and probe_http_duration_seconds{phase="connect"}
-    for: 30s
+    for: 600s
     labels:
       severity: telegram
     annotations:
