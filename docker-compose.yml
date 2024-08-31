@@ -2,7 +2,7 @@ x-common-keys: &common-keys
   restart: unless-stopped
   networks:
     - monitoring-services
-    - ${TRAEFIK_PROXY_NETWORK}
+    - traefik-proxy-network
   deploy:
     resources:
       limits:
@@ -124,6 +124,8 @@ services:
 
 networks:
   monitoring-services:
+  traefik-proxy-network:
+    external: true
 
 volumes:
   prometheus_data:
