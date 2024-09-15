@@ -81,15 +81,6 @@ services:
     volumes:
       - ./appdata/blackbox/blackbox.yml:/etc/blackbox/blackbox.yml
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.45.0
-    <<: *common-keys
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-
   loki:
     image: grafana/loki:latest
     <<: *common-keys
